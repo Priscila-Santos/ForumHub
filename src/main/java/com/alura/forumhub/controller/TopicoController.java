@@ -1,19 +1,21 @@
 package com.alura.forumhub.controller;
 
-import com.alura.forumhub.domain.topico.DadosCadastroTopico;
-import com.alura.forumhub.domain.topico.DadosDetalhamentoTopico;
-import com.alura.forumhub.domain.topico.Topico;
-import com.alura.forumhub.domain.topico.TopicoRepository;
+import com.alura.forumhub.domain.topico.*;
 import com.alura.forumhub.domain.usuario.UsuarioRepository;
 import com.alura.forumhub.domain.curso.CursoRepository;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/topicos")
@@ -49,4 +51,25 @@ public class TopicoController {
 
         return ResponseEntity.created(uri).body(new DadosDetalhamentoTopico(topico));
     }
+
+    @GetMapping
+    public ResponseEntity<Page<DadosListagemTopico>> listar(
+            @RequestParam(required = false) String curso,
+            @RequestParam(required = false) Integer ano,
+            @PageableDefault(size = 10, sort = "dataCriacao") Pageable paginacao
+    ) {
+        Page<Topico> topicos;
+
+        if (curso != null && ano != null) {
+            LocalDateTime inicio = LocalDateTime.of(ano, 1, 1, 0, 0);
+            LocalDateTime fim = LocalDateTime.of(ano, 12, 31, 23, 59);
+            topicos = topicoRepository.findByCursoNomeAndDataCriacaoBetween(curso, inicio, fim, paginacao);
+        } else {
+            topicos = topicoRepository.findAll(paginacao);
+        }
+
+        var page = topicos.map(DadosListagemTopico::new);
+        return ResponseEntity.ok(page);
+    }
+
 }
