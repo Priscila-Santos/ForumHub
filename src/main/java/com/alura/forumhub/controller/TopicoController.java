@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/topicos")
@@ -76,6 +77,24 @@ public class TopicoController {
     public ResponseEntity<DadosDetalhamentoTopico> detalhar(@PathVariable Long id) {
         var topico = topicoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Tópico não encontrado com ID: " + id));
+
+        return ResponseEntity.ok(new DadosDetalhamentoTopico(topico));
+    }
+
+    @PutMapping("/{id}")
+    @Transactional
+    public ResponseEntity<DadosDetalhamentoTopico> atualizar(
+            @PathVariable Long id,
+            @RequestBody @Valid DadosAtualizacaoTopico dados
+    ) {
+        Optional<Topico> optionalTopico = topicoRepository.findById(id);
+
+        if (optionalTopico.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Topico topico = optionalTopico.get();
+        topico.atualizarInformacoes(dados);
 
         return ResponseEntity.ok(new DadosDetalhamentoTopico(topico));
     }

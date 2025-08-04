@@ -60,16 +60,21 @@ public class Topico {
         this.curso = curso;
     }
 
+    public void atualizarInformacoes(DadosAtualizacaoTopico dados) {
+        this.titulo = dados.titulo();
+        this.mensagem = dados.mensagem();
+    }
+
 //    public void excluir() {
 //        this.ativo = false;
 //    }
 
-    public void atualizar(String novoTitulo, String novaMensagem) {
-        if (novoTitulo != null) {
-            this.titulo = novoTitulo;
-        }
-        if (novaMensagem != null) {
-            this.mensagem = novaMensagem;
-        }
-    }
+//    public void atualizar(String novoTitulo, String novaMensagem) {
+//        if (novoTitulo != null) {
+//            this.titulo = novoTitulo;
+//        }
+//        if (novaMensagem != null) {
+//            this.mensagem = novaMensagem;
+//        }
+//    }
 }
