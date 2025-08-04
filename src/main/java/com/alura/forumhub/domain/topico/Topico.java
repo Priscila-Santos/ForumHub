@@ -48,10 +48,10 @@ public class Topico {
     @OneToMany(mappedBy = "topico", cascade = CascadeType.ALL)
     private List<Resposta> respostas;
 
-    private Boolean ativo;
+   // private Boolean ativo;
 
     public Topico(DadosCadastroTopico dados, Usuario autor, Curso curso) {
-        this.ativo = true;
+       // this.ativo = true;
         this.titulo = dados.titulo();
         this.mensagem = dados.mensagem();
         this.dataCriacao = LocalDateTime.now();
@@ -60,9 +60,9 @@ public class Topico {
         this.curso = curso;
     }
 
-    public void excluir() {
-        this.ativo = false;
-    }
+//    public void excluir() {
+//        this.ativo = false;
+//    }
 
     public void atualizar(String novoTitulo, String novaMensagem) {
         if (novoTitulo != null) {

@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Table(name = "usuarios")
 @Entity(name = "Usuario")
@@ -56,6 +57,13 @@ public class Usuario implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
+
+//    @Override
+//    public Collection<? extends GrantedAuthority> getAuthorities() {
+//        return perfis.stream()
+//                .map(perfil -> new SimpleGrantedAuthority(perfil.getNome()))
+//                .collect(Collectors.toList());
+//    }
 
     @Override
     public String getPassword() {
