@@ -28,4 +28,6 @@ public class Curso {
     @OneToMany(mappedBy = "curso", cascade = CascadeType.ALL)
     private List<Topico> topicos;
 
+    public Curso(long id, String curso, String categoria) {
+    }
 }

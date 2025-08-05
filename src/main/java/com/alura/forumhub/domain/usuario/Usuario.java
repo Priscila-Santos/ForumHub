@@ -54,6 +54,9 @@ public class Usuario implements UserDetails {
     )
     private List<Perfil> perfis;
 
+    public Usuario(long id, String nome, String email, String number) {
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_USER"));
