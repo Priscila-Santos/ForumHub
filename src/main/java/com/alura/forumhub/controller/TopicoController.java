@@ -1,9 +1,8 @@
 package com.alura.forumhub.controller;
 
+import com.alura.forumhub.domain.curso.CursoRepository;
 import com.alura.forumhub.domain.topico.*;
 import com.alura.forumhub.domain.usuario.UsuarioRepository;
-import com.alura.forumhub.domain.curso.CursoRepository;
-
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,12 +10,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/topicos")
@@ -35,7 +33,6 @@ public class TopicoController {
     @PostMapping
     @Transactional
     public ResponseEntity<?> cadastrar(@RequestBody @Valid DadosCadastroTopico dados, UriComponentsBuilder uriBuilder) {
-
         if (topicoRepository.existsByTituloAndMensagem(dados.titulo(), dados.mensagem())) {
             return ResponseEntity.badRequest().body("Já existe um tópico com esse título e mensagem.");
         }
@@ -49,7 +46,6 @@ public class TopicoController {
         topicoRepository.save(topico);
 
         var uri = uriBuilder.path("/topicos/{id}").buildAndExpand(topico.getId()).toUri();
-
         return ResponseEntity.created(uri).body(new DadosDetalhamentoTopico(topico));
     }
 
@@ -64,9 +60,9 @@ public class TopicoController {
         if (curso != null && ano != null) {
             LocalDateTime inicio = LocalDateTime.of(ano, 1, 1, 0, 0);
             LocalDateTime fim = LocalDateTime.of(ano, 12, 31, 23, 59);
-            topicos = topicoRepository.findByCursoNomeAndDataCriacaoBetween(curso, inicio, fim, paginacao);
+            topicos = topicoRepository.findByCursoNomeAndDataCriacaoBetweenAndAtivoTrue(curso, inicio, fim, paginacao);
         } else {
-            topicos = topicoRepository.findAll(paginacao);
+            topicos = topicoRepository.findByAtivoTrue(paginacao);
         }
 
         var page = topicos.map(DadosListagemTopico::new);
@@ -75,8 +71,8 @@ public class TopicoController {
 
     @GetMapping("/{id}")
     public ResponseEntity<DadosDetalhamentoTopico> detalhar(@PathVariable Long id) {
-        var topico = topicoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Tópico não encontrado com ID: " + id));
+        var topico = topicoRepository.findByIdAndAtivoTrue(id)
+                .orElseThrow(() -> new RuntimeException("Tópico não encontrado ou foi excluído."));
 
         return ResponseEntity.ok(new DadosDetalhamentoTopico(topico));
     }
@@ -87,16 +83,20 @@ public class TopicoController {
             @PathVariable Long id,
             @RequestBody @Valid DadosAtualizacaoTopico dados
     ) {
-        Optional<Topico> optionalTopico = topicoRepository.findById(id);
+        var topico = topicoRepository.findByIdAndAtivoTrue(id)
+                .orElseThrow(() -> new RuntimeException("Tópico não encontrado ou foi excluído."));
 
-        if (optionalTopico.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        Topico topico = optionalTopico.get();
         topico.atualizarInformacoes(dados);
-
         return ResponseEntity.ok(new DadosDetalhamentoTopico(topico));
     }
 
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity excluir(@PathVariable Long id) {
+        var topico = topicoRepository.findByIdAndAtivoTrue(id)
+                .orElseThrow(() -> new RuntimeException("Tópico não encontrado ou já foi excluído."));
+
+        topico.excluir();
+        return ResponseEntity.noContent().build();
+    }
 }

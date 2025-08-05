@@ -48,7 +48,9 @@ public class Topico {
     @OneToMany(mappedBy = "topico", cascade = CascadeType.ALL)
     private List<Resposta> respostas;
 
-   // private Boolean ativo;
+    @Column(nullable = false)
+    private Boolean ativo = true;
+
 
     public Topico(DadosCadastroTopico dados, Usuario autor, Curso curso) {
        // this.ativo = true;
@@ -65,16 +67,8 @@ public class Topico {
         this.mensagem = dados.mensagem();
     }
 
-//    public void excluir() {
-//        this.ativo = false;
-//    }
+    public void excluir() {
+        this.ativo = false;
+    }
 
-//    public void atualizar(String novoTitulo, String novaMensagem) {
-//        if (novoTitulo != null) {
-//            this.titulo = novoTitulo;
-//        }
-//        if (novaMensagem != null) {
-//            this.mensagem = novaMensagem;
-//        }
-//    }
 }
