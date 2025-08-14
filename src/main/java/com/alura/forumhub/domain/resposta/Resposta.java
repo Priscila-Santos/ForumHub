@@ -37,4 +37,14 @@ public class Resposta {
     @ManyToOne
     @JoinColumn(name = "autor_id", nullable = false)
     private Usuario autor;
+
+    @PrePersist
+    public void prePersist() {
+        if (dataCriacao == null) {
+            dataCriacao = LocalDateTime.now();
+        }
+        if (solucao == null) {
+            solucao = false;
+        }
+    }
 }
