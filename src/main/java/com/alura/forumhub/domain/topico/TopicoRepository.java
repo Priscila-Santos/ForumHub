@@ -21,6 +21,10 @@ public interface TopicoRepository extends JpaRepository<Topico, Long> {
             LocalDateTime fim,
             Pageable pageable
     );
+
+    long countByCursoCategoria(String categoria);
+    long countByCursoCategoriaAndDataCriacaoAfter(String categoria, LocalDateTime dataLimite);
+
 }
 
 

@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/respostas")
+@CrossOrigin(origins = "http://localhost:5173") // libera só para o frontend
 public class RespostaController {
 
     @Autowired

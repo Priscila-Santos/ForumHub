@@ -12,6 +12,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("/usuario")
+@CrossOrigin(origins = "http://localhost:5173") // libera só para o frontend
 public class UsuarioController {
 
     @Autowired

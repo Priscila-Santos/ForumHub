@@ -1,6 +1,7 @@
 package com.alura.forumhub.controller;
 
 import com.alura.forumhub.domain.curso.CursoRepository;
+import com.alura.forumhub.domain.resposta.RespostaRepository;
 import com.alura.forumhub.domain.topico.*;
 import com.alura.forumhub.domain.usuario.UsuarioRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -15,10 +16,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/topicos")
 @SecurityRequirement(name = "bearer-key")
+@CrossOrigin(origins = "http://localhost:5173") // libera só para o frontend
 public class TopicoController {
 
     @Autowired
@@ -29,6 +33,9 @@ public class TopicoController {
 
     @Autowired
     private CursoRepository cursoRepository;
+
+    @Autowired
+    private RespostaRepository respostaRepository;
 
     @PostMapping
     @Transactional
@@ -99,4 +106,23 @@ public class TopicoController {
         topico.excluir();
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/stats")
+    public List<DadosEstatisticosTopicos> stats() {
+        LocalDateTime semanaPassada = LocalDateTime.now().minusWeeks(1);
+        List<DadosEstatisticosTopicos> lista = new ArrayList<>();
+
+        for (String curso : List.of("Mobile", "BackEnd", "FrontEnd", "UX & Design")) {
+            long total     = topicoRepository.countByCursoCategoria(curso);
+            long ultSemana = topicoRepository
+                    .countByCursoCategoriaAndDataCriacaoAfter(curso, semanaPassada);
+            long respostas = respostaRepository.countByTopicoCursoCategoria(curso);
+
+            lista.add(new DadosEstatisticosTopicos(curso, total, ultSemana, respostas));
+        }
+
+        return lista;
+    }
+
+
 }
