@@ -8,7 +8,8 @@ public record DadosListagemTopico(
         LocalDateTime dataCriacao,
         String status,
         String autor,
-        String curso
+        String curso,
+        int respostas
 ) {
     public DadosListagemTopico(Topico topico) {
         this(
@@ -17,7 +18,8 @@ public record DadosListagemTopico(
                 topico.getDataCriacao(),
                 topico.getStatus().toString(),
                 topico.getAutor().getNome(),
-                topico.getCurso().getCategoria()
+                topico.getCurso().getCategoria(),
+                topico.getRespostas().size()
         );
     }
 }
